@@ -7,9 +7,12 @@ import io.github.gabriel.quarkussocial.rest.dto.CreateUserRequest;
 
 import javax.inject.Inject;
 import javax.transaction.Transactional;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.Set;
 
 @Path("/users")
 @Produces(MediaType.APPLICATION_JSON)
@@ -22,9 +25,19 @@ public class UserResource {
     @Inject
     UserRepository userRepository;
 
+    @Inject
+    Validator validator;
+
+
     @POST
     @Transactional
-    public Response createUser(CreateUserRequest userRequest) {
+    public Response createUser(CreateUserRequest userRequest){
+        Set<ConstraintViolation<CreateUserRequest>> violations = validator.validate(userRequest);
+        if (!violations.isEmpty()) {
+            ConstraintViolation<CreateUserRequest> erro = violations.stream().findAny().get();
+            String erroMessage = erro.getMessage();
+            return Response.status(Response.Status.BAD_REQUEST).entity(erroMessage).build();
+        }
         User user = userMapper.toModel(userRequest);
         userRepository.persist(user);
 
