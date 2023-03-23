@@ -31,4 +31,24 @@ public class UserResource {
     public Response listAllUsers() {
         return Response.ok(User.findAll().list()).build();
     }
+
+    @DELETE
+    @Transactional
+    @Path("{id}")
+    public Response delete(@PathParam("id") Long id) {
+        User.findByIdOptional(id).orElseThrow(() -> new NotFoundException("Usuario não encontrado")).delete();
+        return Response.ok().build();
+    }
+
+    @PUT
+    @Transactional
+    @Path("{id}")
+    public Response update(@PathParam("id") Long id, CreateUserRequest userRequest) {
+        User user = User.findById(id);
+        if (user != null) {
+            userMapper.update(userRequest, user);
+            return Response.ok().build();
+        }
+        return Response.status(Response.Status.NOT_FOUND).build();
+    }
 }
