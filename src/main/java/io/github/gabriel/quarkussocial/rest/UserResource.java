@@ -5,6 +5,7 @@ import io.github.gabriel.quarkussocial.domain.repository.UserRepository;
 import io.github.gabriel.quarkussocial.mapper.UserMapper;
 import io.github.gabriel.quarkussocial.rest.dto.CreateUserRequest;
 import io.github.gabriel.quarkussocial.rest.dto.ResponseError;
+import io.netty.handler.codec.http.HttpResponseStatus;
 
 import javax.inject.Inject;
 import javax.transaction.Transactional;
@@ -35,13 +36,12 @@ public class UserResource {
     public Response createUser(CreateUserRequest userRequest){
         Set<ConstraintViolation<CreateUserRequest>> violations = validator.validate(userRequest);
         if (!violations.isEmpty()) {
-            ResponseError responseError = ResponseError.createFromValidation(violations);
-            return Response.status(Response.Status.BAD_REQUEST).entity(responseError).build();
+            return ResponseError.createFromValidation(violations).withStatusCode(ResponseError.UNPROCESSABLE_ENTITY_STATUS);
         }
         User user = userMapper.toModel(userRequest);
         userRepository.persist(user);
 
-        return Response.ok(user).build();
+        return Response.status(Response.Status.CREATED).entity(user).build();
     }
 
     @GET
@@ -56,7 +56,7 @@ public class UserResource {
         User user = userRepository.findByIdOptional(id).orElseThrow(() -> new NotFoundException("Usuario não encontrado"));
         userRepository.delete(user);
 
-        return Response.ok().build();
+        return Response.noContent().build();
     }
 
     @PUT
@@ -66,6 +66,6 @@ public class UserResource {
         User user = userRepository.findByIdOptional(id).orElseThrow(() -> new NotFoundException("Usuario não encontrado"));
         userMapper.update(userRequest, user);
 
-        return Response.ok().build();
+        return Response.noContent().build();
     }
 }
