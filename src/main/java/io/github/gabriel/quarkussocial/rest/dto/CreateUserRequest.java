@@ -5,9 +5,9 @@ import javax.validation.constraints.NotNull;
 
 public class CreateUserRequest {
 
-    @NotBlank(message = "Name is required")
+    @NotBlank
     private String name;
-    @NotNull(message = "Age is required")
+    @NotNull
     private Integer age;
 
     public String getName() {

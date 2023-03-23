@@ -4,6 +4,7 @@ import io.github.gabriel.quarkussocial.domain.model.User;
 import io.github.gabriel.quarkussocial.domain.repository.UserRepository;
 import io.github.gabriel.quarkussocial.mapper.UserMapper;
 import io.github.gabriel.quarkussocial.rest.dto.CreateUserRequest;
+import io.github.gabriel.quarkussocial.rest.dto.ResponseError;
 
 import javax.inject.Inject;
 import javax.transaction.Transactional;
@@ -34,9 +35,8 @@ public class UserResource {
     public Response createUser(CreateUserRequest userRequest){
         Set<ConstraintViolation<CreateUserRequest>> violations = validator.validate(userRequest);
         if (!violations.isEmpty()) {
-            ConstraintViolation<CreateUserRequest> erro = violations.stream().findAny().get();
-            String erroMessage = erro.getMessage();
-            return Response.status(Response.Status.BAD_REQUEST).entity(erroMessage).build();
+            ResponseError responseError = ResponseError.createFromValidation(violations);
+            return Response.status(Response.Status.BAD_REQUEST).entity(responseError).build();
         }
         User user = userMapper.toModel(userRequest);
         userRepository.persist(user);
