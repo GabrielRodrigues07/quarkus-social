@@ -5,7 +5,6 @@ import io.github.gabriel.quarkussocial.domain.repository.UserRepository;
 import io.github.gabriel.quarkussocial.mapper.UserMapper;
 import io.github.gabriel.quarkussocial.rest.dto.CreateUserRequest;
 import io.github.gabriel.quarkussocial.rest.dto.ResponseError;
-import io.netty.handler.codec.http.HttpResponseStatus;
 
 import javax.inject.Inject;
 import javax.transaction.Transactional;
