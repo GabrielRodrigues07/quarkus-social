@@ -1,6 +1,7 @@
 package io.github.gabriel.quarkussocial.rest;
 
 import io.github.gabriel.quarkussocial.domain.model.User;
+import io.github.gabriel.quarkussocial.domain.repository.UserRepository;
 import io.github.gabriel.quarkussocial.mapper.UserMapper;
 import io.github.gabriel.quarkussocial.rest.dto.CreateUserRequest;
 
@@ -18,25 +19,30 @@ public class UserResource {
     @Inject
     UserMapper userMapper;
 
+    @Inject
+    UserRepository userRepository;
+
     @POST
     @Transactional
     public Response createUser(CreateUserRequest userRequest) {
         User user = userMapper.toModel(userRequest);
-        user.persist();
+        userRepository.persist(user);
 
         return Response.ok(user).build();
     }
 
     @GET
     public Response listAllUsers() {
-        return Response.ok(User.findAll().list()).build();
+        return Response.ok(userRepository.findAll().list()).build();
     }
 
     @DELETE
     @Transactional
     @Path("{id}")
     public Response delete(@PathParam("id") Long id) {
-        User.findByIdOptional(id).orElseThrow(() -> new NotFoundException("Usuario não encontrado")).delete();
+        User user = userRepository.findByIdOptional(id).orElseThrow(() -> new NotFoundException("Usuario não encontrado"));
+        userRepository.delete(user);
+
         return Response.ok().build();
     }
 
@@ -44,11 +50,9 @@ public class UserResource {
     @Transactional
     @Path("{id}")
     public Response update(@PathParam("id") Long id, CreateUserRequest userRequest) {
-        User user = User.findById(id);
-        if (user != null) {
-            userMapper.update(userRequest, user);
-            return Response.ok().build();
-        }
-        return Response.status(Response.Status.NOT_FOUND).build();
+        User user = userRepository.findByIdOptional(id).orElseThrow(() -> new NotFoundException("Usuario não encontrado"));
+        userMapper.update(userRequest, user);
+
+        return Response.ok().build();
     }
 }
