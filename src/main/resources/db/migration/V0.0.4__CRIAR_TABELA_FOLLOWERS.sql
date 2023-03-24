@@ -5,6 +5,6 @@ CREATE TABLE FOLLOWERS
     follower_id bigint    NOT NULL REFERENCES USERS (id)
 );
 
-ALTER TABLE FOLLOWERS ADD CONSTRAINT fol_use FOREIGN KEY(user_id) references USERS(id);
-
-ALTER TABLE FOLLOWERS ADD CONSTRAINT fol_use FOREIGN KEY(follower_id) references USERS(id);
+-- ALTER TABLE FOLLOWERS ADD CONSTRAINT fol_use FOREIGN KEY(user_id) references USERS(id);
+--
+-- ALTER TABLE FOLLOWERS ADD CONSTRAINT follo_use FOREIGN KEY(follower_id) references USERS(id);

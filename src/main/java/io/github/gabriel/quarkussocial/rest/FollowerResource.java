@@ -1,14 +1,15 @@
 package io.github.gabriel.quarkussocial.rest;
 
+import io.github.gabriel.quarkussocial.domain.model.Follower;
+import io.github.gabriel.quarkussocial.domain.model.User;
 import io.github.gabriel.quarkussocial.domain.repository.FollowerRepository;
 import io.github.gabriel.quarkussocial.domain.repository.UserRepository;
 import io.github.gabriel.quarkussocial.mapper.FollowerMapper;
+import io.github.gabriel.quarkussocial.rest.dto.FollowerRequest;
 
 import javax.inject.Inject;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.transaction.Transactional;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -30,5 +31,24 @@ public class FollowerResource {
     @GET
     public Response find() {
         return Response.ok().build();
+    }
+
+    @PUT
+    @Transactional
+    public Response followeUser(@PathParam("user_id") Long id, FollowerRequest request) {
+        User user = userRepository.findByIdOptional(id).orElseThrow(NotFoundException::new);
+        User follower = userRepository.findById(request.getFollowerId());
+
+        boolean followers = followerRepository.followers(user, follower);
+
+        if (!followers) {
+            var entity = new Follower();
+            entity.setUser(user);
+            entity.setFollower(follower);
+
+            followerRepository.persist(entity);
+        }
+
+        return Response.noContent().build();
     }
 }
