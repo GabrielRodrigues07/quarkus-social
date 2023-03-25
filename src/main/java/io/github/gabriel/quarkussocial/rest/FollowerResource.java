@@ -6,12 +6,16 @@ import io.github.gabriel.quarkussocial.domain.repository.FollowerRepository;
 import io.github.gabriel.quarkussocial.domain.repository.UserRepository;
 import io.github.gabriel.quarkussocial.mapper.FollowerMapper;
 import io.github.gabriel.quarkussocial.rest.dto.FollowerRequest;
+import io.github.gabriel.quarkussocial.rest.dto.FollowerResponse;
+import io.github.gabriel.quarkussocial.rest.dto.FollowersPerUseResponse;
 
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Path("/users/{user_id}/followers")
@@ -29,8 +33,22 @@ public class FollowerResource {
     UserRepository userRepository;
 
     @GET
-    public Response find() {
-        return Response.ok().build();
+    public Response listFollowers(@PathParam("user_id") Long userId) {
+        userRepository.findByIdOptional(userId).orElseThrow(NotFoundException::new);
+
+        List<Follower> followers = followerRepository.findByUser(userId);
+
+        FollowersPerUseResponse perUseResponse = new FollowersPerUseResponse();
+        perUseResponse.setFollowersCount(followers.size());
+
+//        followers.stream()
+//                .map(follower -> new FollowerResponse(follower.getId(), follower.getFollower().getName()))
+//                .collect(Collectors.toList());
+
+        // method reference
+        List<FollowerResponse> followerResponses = followers.stream().map(FollowerResponse::new).collect(Collectors.toList());
+        perUseResponse.setContent(followerResponses);
+        return Response.ok(perUseResponse).build();
     }
 
     @PUT
