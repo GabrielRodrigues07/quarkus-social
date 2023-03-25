@@ -1,6 +1,5 @@
 package io.github.gabriel.quarkussocial.rest;
 
-import io.github.gabriel.quarkussocial.domain.model.Follower;
 import io.github.gabriel.quarkussocial.domain.model.Post;
 import io.github.gabriel.quarkussocial.domain.model.User;
 import io.github.gabriel.quarkussocial.domain.repository.FollowerRepository;
@@ -61,7 +60,7 @@ public class PostResource {
         boolean followers = followerRepository.followers(user, follower);
 
         if (!followers) {
-            return Response.status(Response.Status.FORBIDDEN).build();
+            return Response.status(Response.Status.FORBIDDEN).entity("You can't see these posts").build();
         }
 
         PanacheQuery<Post> query = postRepository

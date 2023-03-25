@@ -2,7 +2,6 @@ package io.github.gabriel.quarkussocial.rest;
 
 import io.github.gabriel.quarkussocial.rest.dto.CreateUserRequest;
 import io.quarkus.test.junit.QuarkusTest;
-import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.*;
