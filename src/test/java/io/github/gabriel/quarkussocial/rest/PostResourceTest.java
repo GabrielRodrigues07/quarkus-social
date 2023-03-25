@@ -45,4 +45,17 @@ class PostResourceTest {
                 .when().post()
                 .then().statusCode(201);
     }
+
+    @Test
+    @DisplayName("should return 404 when try find")
+    public void return404WhenTryFind() {
+        var postRequest = new CreatePostRequest();
+        postRequest.setText("Some text");
+
+        given().contentType(ContentType.JSON)
+                .body(postRequest)
+                .pathParam("idUser", 2L)
+                .when().post()
+                .then().statusCode(404);
+    }
 }
