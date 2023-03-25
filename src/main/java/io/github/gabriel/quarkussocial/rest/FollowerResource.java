@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 
-@Path("/users/{user_id}/followers")
+@Path("/users/{userId}/followers")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 public class FollowerResource {
@@ -33,7 +33,7 @@ public class FollowerResource {
     UserRepository userRepository;
 
     @GET
-    public Response listFollowers(@PathParam("user_id") Long userId) {
+    public Response listFollowers(@PathParam("userId") Long userId) {
         userRepository.findByIdOptional(userId).orElseThrow(NotFoundException::new);
 
         List<Follower> followers = followerRepository.findByUser(userId);
@@ -53,7 +53,7 @@ public class FollowerResource {
 
     @PUT
     @Transactional
-    public Response followeUser(@PathParam("user_id") Long id, FollowerRequest request) {
+    public Response followeUser(@PathParam("userId") Long id, FollowerRequest request) {
 
         if (id.equals(request.getFollowerId())) {
             return Response.status(Response.Status.CONFLICT).entity("you can't follow yourself").build();
@@ -77,7 +77,7 @@ public class FollowerResource {
 
     @DELETE
     @Transactional
-    public Response unFollowUser(@PathParam("user_id") Long userId, @QueryParam("followerId") Long followerId) {
+    public Response unFollowUser(@PathParam("userId") Long userId, @QueryParam("followerId") Long followerId) {
         userRepository.findByIdOptional(userId).orElseThrow(NotFoundException::new);
 
         followerRepository.deleteByFollowerAndUser(followerId, userId);
