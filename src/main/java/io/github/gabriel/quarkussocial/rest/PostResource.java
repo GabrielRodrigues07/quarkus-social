@@ -1,7 +1,9 @@
 package io.github.gabriel.quarkussocial.rest;
 
+import io.github.gabriel.quarkussocial.domain.model.Follower;
 import io.github.gabriel.quarkussocial.domain.model.Post;
 import io.github.gabriel.quarkussocial.domain.model.User;
+import io.github.gabriel.quarkussocial.domain.repository.FollowerRepository;
 import io.github.gabriel.quarkussocial.domain.repository.PostRepository;
 import io.github.gabriel.quarkussocial.domain.repository.UserRepository;
 import io.github.gabriel.quarkussocial.mapper.PostMapper;
@@ -27,6 +29,8 @@ public class PostResource {
     UserRepository userRepository;
     @Inject
     PostRepository postRepository;
+    @Inject
+    FollowerRepository followerRepository;
 
     @Inject
     PostMapper postMapper;
@@ -43,8 +47,22 @@ public class PostResource {
     }
 
     @GET
-    public Response listAll(@PathParam("idUser") Long id) {
+    public Response listAll(@PathParam("idUser") Long id, @HeaderParam("followerId") Long followerId) {
         User user = userRepository.findByIdOptional(id).orElseThrow(() -> new NotFoundException());
+
+        if (followerId == null) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("You forgot the header followerId")
+                    .build();
+        }
+
+        User follower = userRepository.findByIdOptional(followerId).orElseThrow(() -> new NotFoundException());
+
+        boolean followers = followerRepository.followers(user, follower);
+
+        if (!followers) {
+            return Response.status(Response.Status.FORBIDDEN).build();
+        }
 
         PanacheQuery<Post> query = postRepository
                 .find("user", Sort.by("date", Sort.Direction.Descending), user);
